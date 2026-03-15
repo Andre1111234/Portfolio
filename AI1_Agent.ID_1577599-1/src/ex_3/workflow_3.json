@@ -1,0 +1,272 @@
+{
+  "name": "workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.items }}",
+        "options": {
+          "systemMessage": "=Ты — ИИ-агент-аналитик рынка IT-вакансий.\n\nТвоя цель:\nежедневно анализировать входящие вакансии из RSS-источников и формировать краткий, полезный дайджест для Telegram-канала.\n\nНа вход тебе передаётся массив items — список вакансий.\nКаждый элемент содержит:\n- title\n- link\n- contentSnippet (краткое описание)\n\nТвоя задача:\n1. Проанализировать вакансии.\n2. Отфильтровать нерелевантные, дублирующиеся или слишком общие.\n3. Сгруппировать вакансии по направлениям (например: Backend, Data, Frontend, DevOps, Junior).\n4. Выделить ключевые требования и технологии, если они явно указаны.\n5. Сформировать краткий дайджест в формате, удобном для чтения в Telegram.\n\nФормат вывода (СТРОГО):\n- Используй Markdown\n- Без вступлений и лишних комментариев\n- Не упоминай, что ты ИИ\n- Не добавляй пояснений вне дайджеста\n\nСтруктура сообщения:\n📌 Заголовок дня\n📂 Направление\n— Название вакансии\n— Ключевые навыки (если есть)\n— Ссылка\n\nПример:\n\n📌 Актуальные IT-вакансии — сегодня\n\n📂 Data / Analytics\n— Junior Data Analyst (Python, SQL)\n— Навыки: Python, SQL, Pandas\n— https://example.com\n\n📂 Backend\n— Backend Developer (Go)\n— Навыки: Go, PostgreSQL\n— https://example.com\n\nЕсли вакансий мало — всё равно сформируй аккуратный дайджест.\nЕсли вакансий нет — выведи:\n«Сегодня новых релевантных вакансий не найдено»."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        900,
+        100
+      ],
+      "id": "bf32ab20-2477-4dcb-8e13-a1eeeea7015b",
+      "name": "AI Agent",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "GigaChat/GigaChat-2-Max",
+          "mode": "list",
+          "cachedResultName": "GigaChat/GigaChat-2-Max"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        920,
+        340
+      ],
+      "id": "93df8434-464f-49aa-b9af-be4400ff8efe",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "RLvWhp8ixfAYjg8W",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=-1003539059093",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1260,
+        200
+      ],
+      "id": "a2a847ec-9217-40cf-af1b-3c41a8b75f97",
+      "name": "Telegram",
+      "webhookId": "a5f12e49-105b-4de8-bce6-ed813f85164c",
+      "credentials": {
+        "telegramApi": {
+          "id": "HOe9o5sqHQHr3iec",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -220,
+        60
+      ],
+      "id": "2566d018-8f63-488d-93bc-902682a0d593",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://fetchrss.com/feed/1vaHEf6bt5101vaHJZG5O7z1.rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        40
+      ],
+      "id": "ff4eda14-26b2-4bf3-b7bc-c50d33b4f02c",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "url": "https://fetchrss.com/feed/1vaHEf6bt5101vaHA19FO0ag.rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        220
+      ],
+      "id": "5b5e1aa3-9e8c-4c5b-83b9-280d9bba87b3",
+      "name": "RSS Read1"
+    },
+    {
+      "parameters": {
+        "url": "https://fetchrss.com/feed/1vaHEf6bt5101vaHG8BhXEYl.rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        380
+      ],
+      "id": "b7071904-f6ef-4152-8dec-ac9b49d672c7",
+      "name": "RSS Read2"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        400,
+        80
+      ],
+      "id": "46be2a7e-289d-4047-afaa-4c952464d90f",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "items",
+        "include": "specifiedFields",
+        "fieldsToInclude": "title, link, content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        620,
+        80
+      ],
+      "id": "74b4b2ca-a550-4545-aea3-bce6e1477bbe",
+      "name": "Aggregate"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Read2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6752e1c1-79ed-4c02-8b63-a076fb706b72",
+  "meta": {
+    "instanceId": "386a5f8d029ae5d3c95b244ce6b0985eaf85897e32763a97e482964ddf818b71"
+  },
+  "id": "dW9XsbJpMhRRx1Iv",
+  "tags": []
+}

@@ -1,0 +1,246 @@
+{
+  "name": "workflow 4",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "10d2b1ae-7539-466d-a26d-8f499e7fa116",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "GigaChat/GigaChat-2-Max",
+          "mode": "list",
+          "cachedResultName": "GigaChat/GigaChat-2-Max"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        220
+      ],
+      "id": "1f4646e3-baa7-4f9c-9ffb-6ab3253c904f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "RLvWhp8ixfAYjg8W",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.hh.ru/vacancies",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "data science"
+            },
+            {
+              "name": "per_page",
+              "value": "20"
+            },
+            {
+              "name": "order_by",
+              "value": "publication_time"
+            },
+            {
+              "name": "area",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "f8c27563-43a8-4ffc-99fd-dc7d847c6e85",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "chatId": "-1003539059093",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "c5a7cc71-b3a2-475a-9506-8185e81d7bd3",
+      "name": "Telegram",
+      "webhookId": "2485c6d4-9ecf-45c1-9e42-e9192098c59d",
+      "credentials": {
+        "telegramApi": {
+          "id": "HOe9o5sqHQHr3iec",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "Ты — аналитик рынка труда. Твоя задача — на основе предоставленной информации о вакансиях проанализировать и выделить ключевые компетенции.\n\nПравила обработки:\n\nВходные данные: Получив данные о вакансиях (список, текст или датасет), просканируй их на наличие упоминаний навыков, технологий и требований.\n\nАнализ частотности: Составь частотный словарь, где ключ — название навыка/требования, а значение — количество его упоминаний во всех вакансиях.\n\nРанжирование: Отсортируй требования по убыванию частоты упоминаний.\n\nВыбор ядра: Выбери топ-15 самых частотных требований.\n\nФормат вывода:\n\nСтрого придерживайся следующего шаблона. Не добавляй никаких других комментариев, пояснений или форматирования.\n\ntext\nНа этой неделе я проанализировал [N] свежих вакансий по выбранному направлению. Самыми популярными являются следующие требования:\n\n[Название требования 1]: [Количество] упоминаний\n[Название требования 2]: [Количество] упоминаний\n[Название требования 3]: [Количество] упоминаний\n...\n[Название требования 15]: [Количество] упоминаний\nВажные указания:\n\nN — это общее количество обработанных вакансий.\n\nНазвания требований должны быть краткими и понятными (например, \"Python\", \"Работа в команде\", \"SQL\", \"Git\").\n\nЕсли во входных данных нет явного указания количества вакансий (N), не указывай эту цифру в выводе, начни сразу с \"Самыми популярными являются...\".\n\nТвой ответ должен быть готовым дайджестом, который можно сразу использовать. Навыков должно быть максимум 10"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        760,
+        0
+      ],
+      "id": "cad8eabf-c9a0-4ce9-b452-1dd761131932",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "GigaChat/GigaChat-2-Max",
+          "mode": "list",
+          "cachedResultName": "GigaChat/GigaChat-2-Max"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        820,
+        280
+      ],
+      "id": "5f434e78-5a65-4899-a49b-5ed223796a83",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "RLvWhp8ixfAYjg8W",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.items }}",
+        "options": {
+          "systemMessage": "Ты — система парсинга данных. Твоя единственная задача — извлечь и перечислить все навыки из предоставленных JSON-данных.\n\nПравила обработки:\n\nИсточник данных: Анализируй ТОЛЬКО содержимое поля \"requirement\" в JSON-объектах. Все остальные поля игнорируй.\n\nФормат вывода: Выведи чистый список навыков в формате:\n\ntext\n- Навык 1\n- Навык 2\n- Навык 3 "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        420,
+        0
+      ],
+      "id": "e504d6e8-23f7-48e2-a20e-577c248daa47",
+      "name": "AI Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7914c8bc-92f7-4309-99e4-e1ecccfd5a63",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "386a5f8d029ae5d3c95b244ce6b0985eaf85897e32763a97e482964ddf818b71"
+  },
+  "id": "nSlTC1FujO4P6SYV",
+  "tags": []
+}

@@ -1,0 +1,368 @@
+{
+  "name": "My workflow 6",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1280,
+        240
+      ],
+      "id": "5a041173-7523-440e-8ec6-f2d774a0b8b8",
+      "name": "Telegram Trigger",
+      "webhookId": "3710b26e-dc7c-494a-a238-9205a9b6931f",
+      "credentials": {
+        "telegramApi": {
+          "id": "HOe9o5sqHQHr3iec",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "Ты — ИИ-агент внутри n8n и персональный учебный ментор.\n\nТвоя задача — сопровождать пользователя в обучении:\n1) уточнить тему обучения,\n2) уточнить уровень,\n3) сформировать учебный план,\n4) после подтверждения плана — присылать обучающие материалы по одному пункту.\n\nВАЖНЫЕ ПРАВИЛА:\n\n1. Если тема обучения ещё НЕ определена:\n   - задай вопрос: «Чему бы ты хотел научиться? Назови область или язык.»\n\n2. Если тема обучения определена:\n   - НИКОГДА не возвращайся к вопросу выбора темы.\n   - переходи к вопросу об уровне владения темой.\n\n3. Когда тема и уровень определены:\n   - сформируй учебный план в формате:\n     Тема 1: [понятие 1, понятие 2, понятие 3]\n     Тема 2: [понятие 1, понятие 2, понятие 3]\n\n4. После формирования плана:\n   - попроси пользователя подтвердить план.\n   - НЕ начинай обучение без подтверждения.\n\n5. После подтверждения плана:\n   - объясняй ОДИН пункт за сообщение.\n   - не повторяй темы.\n   - двигайся строго последовательно.\n\n6. Если для объяснения темы или понятия нужны актуальные материалы, примеры или определения:\n   - ты НЕ отвечаешь пользователю напрямую.\n   - ты возвращаешь ТОЛЬКО строку строго в формате:\n     tavily(query=\"краткий поисковый запрос\")\n\n7. Если интернет не нужен — отвечай обычным текстом.\n\nЗАПРЕЩЕНО:\n- повторно спрашивать тему, если она уже названа;\n- оценивать ответы пользователя как «некорректные»;\n- возвращаться к предыдущим этапам без причины.\n\nСтиль общения:\n- спокойный,\n- дружелюбный,\n- уверенный,\n- без канцелярита.\n\n\nЕсли пользователь сообщил уровень знаний,\nсчитай, что этап выбора области завершён окончательно.\n\n\nКРИТИЧЕСКОЕ ПРАВИЛО ПЕРЕХОДА ЭТАПОВ\n\nЕсли область обучения уже определена (например: Python для анализа данных)\nИ пользователь указал уровень (начальный / средний / продвинутый),\n\nТО:\n- ты СРАЗУ переходишь к формированию учебного плана\n- ты НЕ задаёшь дополнительных вопросов о направлении\n- ты НЕ уточняешь «сторону развития»\n- ты НЕ возвращаешься к выбору темы"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        480,
+        20
+      ],
+      "id": "46343e84-70b9-4b99-bfad-6fe8ccba27ee",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "GigaChat/GigaChat-2-Max",
+          "mode": "list",
+          "cachedResultName": "GigaChat/GigaChat-2-Max"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        260
+      ],
+      "id": "86cb13e5-94db-4dcf-bc4f-9668dce330ec",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "RLvWhp8ixfAYjg8W",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer tvlyMmI2NDY0NWItNzY2MS00OTAxLWIwNzQtYmQ3YWQ2MThiMjkx.115f117355d150a849c5fe248fc1dae5"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"query\": \"={{$json.tavilyQuery}}\",\n   \"search_depth\": \"basic\",\n   \"include_answer\": true ,\n   \"max_results\": 5\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        -380
+      ],
+      "id": "132d5b99-9e05-4ab3-9db2-19a370159df2",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        860,
+        40
+      ],
+      "id": "7681275f-6de0-4981-9a4b-8724ae59e7f4",
+      "name": "Telegram1",
+      "webhookId": "4a9f5710-c6ed-4a36-8e15-7e4ded8dad64",
+      "credentials": {
+        "telegramApi": {
+          "id": "HOe9o5sqHQHr3iec",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "511e22b8-16eb-4273-a91e-89cb088d8470",
+              "leftValue": "={{ !!$json.message.document }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7ea2ce77-b76f-4588-ab5c-c6b4f5581015",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1060,
+        240
+      ],
+      "id": "58af1410-1011-4871-9ada-1de53c3a33f2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "let fileId = null;\nlet fileType = null;\n\nconst msg = $json.message;\n\n// PDF-документ\nif (msg.document && msg.document.mime_type === 'application/pdf') {\n  fileId = msg.document.file_id;\n  fileType = 'pdf';\n}\n\n// Обычный текст\nelse if (msg.text) {\n  fileType = 'text';\n}\n\nreturn [\n  {\n    json: {\n      fileId,\n      fileType,\n      text: msg.text || null\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        180
+      ],
+      "id": "86e1af78-6517-4e67-b9aa-aea494ee7fa3",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.fileId }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -600,
+        60
+      ],
+      "id": "2c9ccddd-75f2-43ed-bb77-8b6dbd3edf68",
+      "name": "Telegram",
+      "webhookId": "6eacccd3-eca2-4f0c-b6da-cc769e2898d3",
+      "credentials": {
+        "telegramApi": {
+          "id": "HOe9o5sqHQHr3iec",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "=",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        240
+      ],
+      "id": "cfc4b05f-a2e1-41db-ba40-e8b9921f70f8",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "RLvWhp8ixfAYjg8W",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "={{ $json.documentText }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        -40,
+        -40
+      ],
+      "id": "abcc366b-d90c-4d69-b535-c7864b2879bc",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "OnDRBxw8UN4k81CJ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        60
+      ],
+      "id": "46b4ff5c-0728-4d65-9dc0-4cdd0ee67348",
+      "name": "Extract from File"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "32344d96-6f2f-4823-b72e-cbde2c8377c8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "386a5f8d029ae5d3c95b244ce6b0985eaf85897e32763a97e482964ddf818b71"
+  },
+  "id": "QPInZ8IhtEQVtf5H",
+  "tags": []
+}
