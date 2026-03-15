@@ -1,0 +1,20 @@
+2025-11-22 21:55:36 Research class initialized with file path: data.csv
+2025-11-22 21:55:36 Starting file reading process
+2025-11-22 21:55:36 File not found
+2025-11-22 21:55:36 Attempting to send Telegram message
+2025-11-22 21:55:36 Telegram message prepared: The report hasn't been created due to an error
+2025-11-22 21:56:17 Research class initialized with file path: data.csv
+2025-11-22 21:56:17 Starting file reading process
+2025-11-22 21:56:17 Successfully read 11 data points from file
+2025-11-22 21:56:17 Calculations class initialized with data
+2025-11-22 21:56:17 Analytics class initialized
+2025-11-22 21:56:17 Calculating counts of heads and tails
+2025-11-22 21:56:17 Counts calculated: heads=5, tails=6
+2025-11-22 21:56:17 Calculating fractions
+2025-11-22 21:56:17 Fractions calculated: heads=0.4545, tails=0.5455
+2025-11-22 21:56:17 Generating 3 random predictions
+2025-11-22 21:56:17 Generated 3 random predictions
+2025-11-22 21:56:17 Saving file report.txt
+2025-11-22 21:56:17 File report.txt saved successfully
+2025-11-22 21:56:17 Attempting to send Telegram message
+2025-11-22 21:56:17 Telegram message prepared: The report has been successfully created
